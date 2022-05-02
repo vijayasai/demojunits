@@ -1,0 +1,84 @@
+# This is the mock case definition file,
+#  There could be multiple of mock case files being used in one junit test class
+#  it could be referred in the annotation as @ActiveProfiles({ "test", "mock_cases1", "mock_cases2"})
+#  or use different mock_case file in different junit test class.
+mock:
+  case:
+    # The following is the list of case, which contains the request/response pair
+    # once the request is matched by httpMethod and the string defined in exactMatch or regEx (Reqular Expression for url pattern)
+    # it will then check the queryParam, and the body.exactMatch or body.regEx (Reqular Expression for body string pattern)
+    # if they all matched, it will check validation.header if validation section present
+    #  or no header check performed if the validation section is omitted
+    # if the incoming request matches all above criteria, the defined response with headers/body/httpStatus is going to returned.
+    # if validation of the headers failed, it will return the error response with the definition in response.error
+    -
+      request:
+        httpMethod: get
+        uri:   # the following defines exactMatch or regEx(regular expression for url pattern) but not both
+          exactMatch: /mock/test
+          regEx:
+        queryParam: # the list of queryParam can be removed if no query parameters are required to be matched
+          -
+            name: filename
+            value: econ.pdf
+          -
+            name: account
+            value: a1432121
+        body:
+          exactMatch:
+          regEx:
+        validation:  # validation section can be removed if no header validation is required.
+          header:
+            -
+              name: traceId
+              value: Abcd1234
+            -
+              name: Authorization
+              value: Bearer token
+      response:  # this defines the mock response that are going to returned when the request url/httpMethod/param/ are metched
+        header:  # response header
+          -
+            name: traceId
+            value: Abcd1234
+          -
+            name: ActivityId
+            value: 3ae0a30e-4fac-4fac-9d40-bf9f90d22520
+          -
+            name: Content-Type
+            value: application/json
+        body:   # response body, which reads from the file path defined in body.file
+          file: './src/test/resource/mock/abc.json'
+        httpStatus: 200
+        error:  # this defines the error response (message/httpStatus) when header validation failed
+          message: failed on service call for /mock/test, it requires to match mock headers for traceId, Authorization
+          httpStatus: 400
+    -
+      request:
+        header:
+          - name: trace-id
+            value: Abcd1234
+        httpMethod: POST
+        uri:
+          exactMatch: /mock/v1/statements/routings
+          regEx:
+        body:
+          exactMatch:
+          regEx:
+          targetUriList: /issuing/digital/statement/paper/{accountId}/customer/{customerId}/preferences
+          targetHttpMethodValList: PUT
+      response:
+        header:
+          - name: ngp-trace-id
+            value: Abcd1234
+          - name: ngp-status-code
+            value: 0
+          - name: ngp-status-message
+            value: Success
+          - name: Content-Type
+            value: application/json
+        body:
+          file: './src/test/resource/mock/xyz.json'
+        httpStatus: 200
+        error:
+          message: failed on service call for /issuing/digital/statement/paper/{accountId}/customer/{customerId}/preferences
+          httpStatus: 500

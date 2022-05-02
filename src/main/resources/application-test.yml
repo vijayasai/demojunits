@@ -1,0 +1,75 @@
+#### Tomcat Settings ####
+server:
+    port: 8085
+
+
+logging:
+    level:
+        root: ERROR
+    # Tomcat Internal Logs
+        org:
+          springframework:
+                       boot:
+                           context:
+                               embedded:
+                                      tomcat:
+                                          TomcatEmbeddedServletContainer: ERROR
+#         apache:
+#            tomcat: DEBUG
+#            catalina: DEBUG
+    # Setting log4j properties          
+    config: classpath:log4j_midtier_lite.xml
+# Setting Feign log level
+    feign:
+       log:
+         level: NONE
+# Disabling feign's hystrix
+feign:
+   hystrix:
+     enabled: false          
+# Enabling feign apache implementation
+   http:
+     client:
+         enabled: true
+# Setting http client timeouts
+   client:
+     econsent:
+         timeout:
+             connect: 3000
+             request: 1000
+             socket: 10000
+         evict:
+             idleconnections: 30000
+         maxconn:
+             perroute: 100
+             total: 1000
+         conn:
+             timetolive: 60000
+     general: # these timeouts/threadpool config does not work, but needed for application to start
+         timeout:
+             connect: 3000
+             request: 1000
+             socket: 10000
+         evict:
+             idleconnections: 30000
+         maxconn:
+             perroute: 100
+             total: 1000
+         conn:
+             timetolive: 60000
+     config: # these timeouts for MT-core calls - work
+       MTCOR-InternalCredentials:
+         connectTimeout: 3000
+         readTimeout: 10000 
+       MTCOR-CacheSvc:
+         connectTimeout: 3000
+         readTimeout: 10000
+       MTCOR-CustomerProfile:
+         connectTimeout: 3000
+         readTimeout: 10000
+         
+apache:
+   feign:
+     client:
+        connection:
+           timeout: 10000
